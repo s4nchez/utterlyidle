@@ -3,8 +3,10 @@ package com.googlecode.utterlyidle;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Pair.pair;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.PathParameters.pathParameters;
 import static com.googlecode.utterlyidle.UriTemplate.uriTemplate;
+import static com.googlecode.utterlyidle.UriTemplatePart.uriTemplatePart;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -94,5 +96,17 @@ public class UriTemplateTest {
     public void canGenerateUri() {
         UriTemplate template = uriTemplate("path/{id}");
         assertThat(template.generate(pathParameters(pair("id","foo"))), is("path/foo"));
+    }
+
+    @Test
+    public void canExtractParts() {
+        final UriTemplate template = uriTemplate("/test/some/thing");
+        assertThat(template.extractParts(), is(sequence(uriTemplatePart("test", false), uriTemplatePart("some", false), uriTemplatePart("thing", false))));
+    }
+
+    @Test
+    public void canExtractPartsWithPathParams() {
+        final UriTemplate template = uriTemplate("/test/{some}/thing");
+        assertThat(template.extractParts(), is(sequence(uriTemplatePart("test", false), uriTemplatePart("some", true), uriTemplatePart("thing", false))));
     }
 }

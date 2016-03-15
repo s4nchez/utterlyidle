@@ -1,0 +1,1 @@
+$pathSegments:{ part | / $(part.type)()$ }$

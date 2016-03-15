@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.googlecode.totallylazy.Maps.map;
 import static com.googlecode.totallylazy.Strings.EMPTY;
 import static com.googlecode.totallylazy.predicates.Predicates.not;
 
@@ -39,11 +40,19 @@ public class MatchFailureRenderer implements Renderer<MatchFailure> {
             return new HashMap<String,Object>() {{
                     put("method", httpMethod.equals("*") ? "ANY" : httpMethod);
                     put("path", redirector.uriOf(binding).path());
+                    put("pathSegments", uriPartsAsModel(binding));
                     put("query", parameterAsModel(parameters.filter(p -> p.parametersClass().equals(QueryParameters.class))));
                     put("form", parameterAsModel(parameters.filter(p -> p.parametersClass().equals(FormParameters.class))));
                 }};
         }));
         return group.get("matchFailure").render(model);
+    }
+
+    private Sequence<Map<String, Object>> uriPartsAsModel(final Binding binding) {
+        return binding.uriTemplate()
+                .extractParts()
+                .map(part -> map("segment", part.name(),
+                        "type", part.isPathParameter() ? "pathParameter" : "pathPart"));
     }
 
     private Map<String,Object> parameterAsModel(Sequence<NamedParameter> parameters) {

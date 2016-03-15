@@ -1,0 +1,1 @@
+<input class="pathSegment" type="hidden" value="$part.segment$"/>$part.segment$

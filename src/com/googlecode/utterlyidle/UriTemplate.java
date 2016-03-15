@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.regex.Regex.regex;
 import static com.googlecode.utterlyidle.PathParameters.pathParameters;
+import static com.googlecode.utterlyidle.UriTemplatePart.uriTemplatePart;
 
 public class UriTemplate implements Extractor<String, PathParameters>, Predicate<String> {
     private static final Regex pathParameters = regex("\\{([^\\}]+?)(?:\\:([^\\}]+))?\\}");
@@ -83,4 +85,14 @@ public class UriTemplate implements Extractor<String, PathParameters>, Predicate
     public int segments() {
         return template.replaceAll("\\{[^\\}]*\\}", " ").split("\\/").length;
     }
+
+    public Sequence<UriTemplatePart> extractParts() {
+        return sequence(template.split("\\/"))
+                .map(segment -> pathParameters.extract(segment)
+                        .headOption()
+                        .map(pathParameterName -> uriTemplatePart(pathParameterName, true))
+                        .getOrElse(uriTemplatePart(segment, false))
+                );
+    }
+
 }

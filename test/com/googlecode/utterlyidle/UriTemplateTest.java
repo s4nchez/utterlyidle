@@ -3,11 +3,12 @@ package com.googlecode.utterlyidle;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Pair.pair;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.PathParameters.pathParameters;
 import static com.googlecode.utterlyidle.UriTemplate.uriTemplate;
-import static com.googlecode.utterlyidle.UriTemplatePart.uriTemplatePart;
+import static com.googlecode.utterlyidle.UriTemplatePartMatcher.pathParameter;
+import static com.googlecode.utterlyidle.UriTemplatePartMatcher.pathPart;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 @SuppressWarnings("unchecked")
@@ -34,11 +35,11 @@ public class UriTemplateTest {
 
         assertThat(
                 template.generate(pathParameters(pair("name", "a name with spaces"))),
-                   is("properties/a+name+with+spaces"));
+                is("properties/a+name+with+spaces"));
 
         assertThat(
                 template.generate(pathParameters(pair("name", "a/name/with/slashes"))),
-                   is("properties/a/name/with/slashes"));
+                is("properties/a/name/with/slashes"));
     }
 
     @Test
@@ -48,7 +49,7 @@ public class UriTemplateTest {
         PathParameters parameters = template.extract("properties/123/bob");
         assertThat(parameters.getValue("id"), is("123"));
         assertThat(parameters.getValue("name"), is("bob"));
-        assertThat(template.generate(pathParameters(pair("id", "123"), pair("name","bob"))), is("properties/123/bob"));
+        assertThat(template.generate(pathParameters(pair("id", "123"), pair("name", "bob"))), is("properties/123/bob"));
     }
 
     @Test
@@ -95,18 +96,18 @@ public class UriTemplateTest {
     @Test
     public void canGenerateUri() {
         UriTemplate template = uriTemplate("path/{id}");
-        assertThat(template.generate(pathParameters(pair("id","foo"))), is("path/foo"));
+        assertThat(template.generate(pathParameters(pair("id", "foo"))), is("path/foo"));
     }
 
     @Test
     public void canExtractParts() {
         final UriTemplate template = uriTemplate("/test/some/thing");
-        assertThat(template.extractParts(), is(sequence(uriTemplatePart("test", false), uriTemplatePart("some", false), uriTemplatePart("thing", false))));
+        assertThat(template.extractParts(), contains(pathPart("test"), pathPart("some"), pathPart("thing")));
     }
 
     @Test
     public void canExtractPartsWithPathParams() {
         final UriTemplate template = uriTemplate("/test/{some}/thing");
-        assertThat(template.extractParts(), is(sequence(uriTemplatePart("test", false), uriTemplatePart("some", true), uriTemplatePart("thing", false))));
+        assertThat(template.extractParts(), contains(pathPart("test"), pathParameter("some"), pathPart("thing")));
     }
 }
